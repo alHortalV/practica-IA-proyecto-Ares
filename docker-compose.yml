@@ -1,0 +1,39 @@
+services:
+  servicio-ia:
+    build: ./servicio_ia
+    container_name: servicio-ia
+    ports:
+      - "8000:8000"
+    networks:
+      - red-app
+    restart: unless-stopped
+    # YOLO requiere un poco más de RAM
+    mem_limit: 1024m
+
+  servicio-intermediario:
+    build: ./servicio_intermediario
+    container_name: servicio-intermediario
+    ports:
+      - "3000:3000"
+    environment:
+      - URL_SERVICIO_IA=http://servicio-ia:8000
+    depends_on:
+      - servicio-ia
+    networks:
+      - red-app
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - servicio-intermediario
+    networks:
+      - red-app
+    restart: unless-stopped
+
+networks:
+  red-app:
+    driver: bridge
