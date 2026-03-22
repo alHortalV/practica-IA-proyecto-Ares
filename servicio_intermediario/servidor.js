@@ -38,6 +38,15 @@ aplicacion.post("/predecir", subida_archivos.array("archivos", 10), async (petic
     return respuesta.status(400).json({ error: "No se han subido archivos" });
   }
 
+  // Validación extra: Error personalizado si llega algo que no sea una imagen
+  const todosSonImagenes = peticion.files.every(archivo => archivo.mimetype.startsWith("image/"));
+  if (!todosSonImagenes) {
+    return respuesta.status(415).json({
+      error: "TIPO_ARCHIVO_INVALIDO",
+      mensaje: "Has subido un archivo que no es una imagen. Por favor, sube solo formatos válidos (JPG, PNG, etc)."
+    });
+  }
+
   console.log(`[INTERMEDIARIO] Procesando ${peticion.files.length} archivos`);
 
   try {

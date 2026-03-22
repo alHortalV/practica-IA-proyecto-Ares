@@ -252,7 +252,12 @@
                     body: formData
                 });
 
-                if(!peticion.ok) throw new Error("Error en el servidor o límite de peticiones superado.");
+                if(!peticion.ok) {
+                    if (peticion.status === 429) {
+                        throw new Error("Demasiadas Peticiones");
+                    }
+                    throw new Error("Error interno del servidor");
+                }
 
                 const resultados = await peticion.json();
                 loader.style.display = 'none';
